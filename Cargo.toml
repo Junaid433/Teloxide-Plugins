@@ -1,0 +1,31 @@
+[package]
+name = "teloxide-plugins"
+version = "0.1.0"
+edition = "2021"
+description = "Smart plugin system for Teloxide bots"
+license = "MIT"
+authors = ["Junaid Rahman <junaid.cloud2@gmail.com>"]
+
+[dependencies]
+once_cell = "1.19"
+regex = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+teloxide = "0.17"
+ctor = "0.2"
+dptree = "0.5"
+
+teloxide-plugins-macros = { path = "./teloxide-plugins-macros" }
+
+[features]
+default = []
+
+[profile.dev]
+opt-level = 2
+debug = true
+incremental = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "debuginfo"

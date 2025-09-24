@@ -1,0 +1,31 @@
+[package]
+name = "teloxide-plugins-macros"
+version = "0.1.0"
+edition = "2024"
+description = "Procedural macros for Teloxide smart plugins"
+license = "MIT"
+authors = ["Junaid Rahman <junaid.cloud2@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { version = "1.0", default-features = false, features = ["span-locations"] }
+quote = { version = "1.0", default-features = false }
+syn = { version = "2.0", default-features = false, features = ["full"] }
+ctor = { version = "0.2", optional = true }
+tokio = { version = "1.0", features = ["rt", "rt-multi-thread"] }
+
+[features]
+default = ["ctor"]   
+
+[profile.dev]
+opt-level = 2
+debug = true
+incremental = true
+
+[profile.release]
+opt-level = 3   
+lto = true
+codegen-units = 1        
+strip = "debuginfo"
