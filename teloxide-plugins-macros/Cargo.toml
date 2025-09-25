@@ -1,7 +1,7 @@
 [package]
 name = "teloxide-plugins-macros"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 description = "Procedural macros for Teloxide smart plugins"
 license = "MIT"
 authors = ["Junaid Rahman <junaid.cloud2@gmail.com>"]
