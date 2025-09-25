@@ -11,6 +11,7 @@ edition = "2021"
 description = "Smart plugin system for Teloxide bots"
 license = "MIT"
 authors = ["Junaid Rahman <junaid.cloud2@gmail.com>"]
+repository = "https://github.com/Junaid433/Teloxide-Plugins"
 
 [dependencies]
 once_cell = "1.19"
