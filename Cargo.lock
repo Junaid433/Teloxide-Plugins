@@ -1536,13 +1536,12 @@ dependencies = [
 
 [[package]]
 name = "teloxide-plugins-macros"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "ctor",
  "proc-macro2",
  "quote",
  "syn",
- "tokio",
 ]
 
 [[package]]

@@ -6,7 +6,7 @@ members = [
 
 [package]
 name = "teloxide-plugins"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Smart plugin system for Teloxide bots"
 license = "MIT"
@@ -20,7 +20,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 teloxide = "0.17"
 ctor = "0.2"
 dptree = "0.5"
-teloxide-plugins-macros = { version = "0.1.0", path = "./teloxide-plugins-macros" }
+teloxide-plugins-macros = { version = "0.1.1", path = "./teloxide-plugins-macros" }
 
 [features]
 default = []
