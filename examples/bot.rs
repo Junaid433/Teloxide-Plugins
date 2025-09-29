@@ -1,5 +1,5 @@
 use teloxide::prelude::*;
-use teloxide_plugins::{PluginContext, dispatch};
+use teloxide_plugins::{dispatch, PluginContext};
 mod plugs;
 
 async fn handle_message(bot: Bot, msg: Message) -> ResponseResult<()> {
@@ -21,7 +21,6 @@ async fn main() {
     println!("Starting bot...");
 
     let bot = Bot::new(std::env::var("TELOXIDE_BOT_TOKEN").unwrap());
-
 
     let handler = dptree::entry()
         .branch(Update::filter_message().endpoint(handle_message))

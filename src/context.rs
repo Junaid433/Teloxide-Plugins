@@ -1,5 +1,5 @@
 use teloxide::prelude::*;
-use teloxide::types::{Message, CallbackQuery};
+use teloxide::types::{CallbackQuery, Message};
 
 #[derive(Clone)]
 pub struct PluginContext {
@@ -10,6 +10,10 @@ pub struct PluginContext {
 
 impl PluginContext {
     pub fn new(bot: Bot, message: Option<Message>, callback_query: Option<CallbackQuery>) -> Self {
-        Self { bot, message, callback_query }
+        Self {
+            bot,
+            message,
+            callback_query,
+        }
     }
 }
