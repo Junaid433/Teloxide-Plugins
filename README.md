@@ -61,7 +61,7 @@ Your `Cargo.toml` should look something like:
 ```toml
 [dependencies]
 teloxide = "0.17"
-teloxide-plugins = "0.1.1"
+teloxide-plugins = "0.1.4"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 
