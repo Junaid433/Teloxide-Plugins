@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**The easiest way to create Telegram bots with Rust!**
+The easiest way to create Telegram bots with Rust!
 
 [![Crates.io](https://img.shields.io/crates/v/teloxide-plugins.svg)](https://crates.io/crates/teloxide-plugins)
 [![Documentation](https://docs.rs/teloxide-plugins/badge.svg)](https://docs.rs/teloxide-plugins)
@@ -13,11 +13,12 @@
 
 </div>
 
-## ✨ What is Teloxide Plugins?
+## What is this?
 
-Teloxide Plugins revolutionizes Telegram bot development in Rust by providing a powerful yet simple plugin system. Instead of writing complex message handling and routing code, you just add a `#[TeloxidePlugin]` attribute above your functions, and they automatically become bot commands!
+It's a macro-based plugin system for teloxide. Instead of manually wiring up dispatch trees, you slap a `#[TeloxidePlugin]` attribute on your functions and the macro handles the routing.
 
-**Before (Traditional Approach):**
+The old way:
+
 ```rust
 let handler = dptree::entry()
     .branch(Update::filter_message()
@@ -27,7 +28,8 @@ let handler = dptree::entry()
             .endpoint(help_handler)));
 ```
 
-**After (With Teloxide Plugins):**
+The new way:
+
 ```rust
 #[TeloxidePlugin(commands = ["ping"], prefixes = ["/"])]
 async fn ping(bot: Bot, msg: Message) {
@@ -35,26 +37,26 @@ async fn ping(bot: Bot, msg: Message) {
 }
 ```
 
-That's it! 🎉
+That's the basic idea.
 
-## 📋 Prerequisites
+## Requirements
 
-- **Rust** 1.70+ - [Install Rust](https://rustup.rs/)
-- **Telegram Bot Token** - [Get one from @BotFather](https://t.me/botfather)
-- **Basic Rust Knowledge** - Understanding of `async`/`await`
+- Rust 1.70 or newer
+- A Telegram bot token (get one from @BotFather)
+- Basic familiarity with async Rust
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Create Your Bot Project
+### 1. Create a new project
 
 ```bash
-cargo new my-awesome-bot
-cd my-awesome-bot
+cargo new my-bot
+cd my-bot
 ```
 
-### 2. Add Dependencies
+### 2. Add dependencies
 
-Add to your `Cargo.toml`:
+Your `Cargo.toml` should look something like:
 
 ```toml
 [dependencies]
@@ -63,9 +65,9 @@ teloxide-plugins = "0.1.1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 
-### 3. Create Your First Plugin
+### 3. Write your first bot
 
-Replace `src/main.rs` with:
+Replace `src/main.rs` with this:
 
 ```rust
 use teloxide::prelude::*;
@@ -78,12 +80,12 @@ async fn ping_handler(bot: Bot, msg: Message) {
 
 #[TeloxidePlugin(regex = ["(?i)hello"])]
 async fn greeting_handler(bot: Bot, msg: Message) {
-    bot.send_message(msg.chat.id, "👋 Hi there! How can I help you?").await.unwrap();
+    bot.send_message(msg.chat.id, "Hey!").await.unwrap();
 }
 
 #[TeloxidePlugin(commands = ["help"], prefixes = ["/"])]
 async fn help_handler(bot: Bot, msg: Message) {
-    bot.send_message(msg.chat.id, "🤖 Available commands: /ping, /help").await.unwrap();
+    bot.send_message(msg.chat.id, "Commands: /ping, /help").await.unwrap();
 }
 
 async fn message_handler(bot: Bot, msg: Message) -> ResponseResult<()> {
@@ -94,12 +96,12 @@ async fn message_handler(bot: Bot, msg: Message) -> ResponseResult<()> {
 
 #[tokio::main]
 async fn main() {
-    let bot = Bot::new("YOUR_BOT_TOKEN");
-
+    let bot = Bot::new("YOUR_BOT_TOKEN_HERE"); 
+    
     let handler = dptree::entry()
         .branch(Update::filter_message().endpoint(message_handler));
 
-    println!("🚀 Bot is starting... Send /ping to test!");
+    println!("Bot is running... try sending /ping");
 
     Dispatcher::builder(bot, handler)
         .enable_ctrlc_handler()
@@ -109,134 +111,83 @@ async fn main() {
 }
 ```
 
-### 4. Get Your Bot Token
-
-1. Message [@BotFather](https://t.me/botfather) on Telegram
-2. Send `/newbot` and follow the instructions
-3. Copy your bot token
-4. Replace `"YOUR_BOT_TOKEN"` in the code
-
-### 5. Run Your Bot
+### 4. Run it
 
 ```bash
 cargo run
 ```
 
-Test it by sending `/ping` or `hello` to your bot! 🎉
+Then message your bot with `/ping` or just "hello".
 
-## 📖 Table of Contents
+## Plugin Types
 
-- [✨ What is Teloxide Plugins?](#-what-is-teloxide-plugins)
-- [📋 Prerequisites](#-prerequisites)
-- [🚀 Quick Start](#-quick-start)
-- [🎯 Plugin Types](#-plugin-types)
-  - [Command Plugins](#command-plugins)
-  - [Regex Plugins](#regex-plugins)
-  - [Callback Plugins](#callback-plugins)
-- [🔧 Advanced Usage](#-advanced-usage)
-  - [Multiple Commands & Prefixes](#multiple-commands--prefixes)
-  - [Error Handling](#error-handling)
-  - [State Management](#state-management)
-  - [Performance Tips](#performance-tips)
-- [📚 Examples](#-examples)
-  - [Echo Bot](#echo-bot)
-  - [Weather Bot](#weather-bot)
-  - [Calculator Bot](#calculator-bot)
-  - [Interactive Menu Bot](#interactive-menu-bot)
-- [🛠️ API Reference](#️-api-reference)
-- [🔍 Troubleshooting](#-troubleshooting)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+### Command Plugins
 
-## 🎯 Plugin Types
-
-### Command Plugins 📝
-
-Respond to specific commands like `/start`, `/help`, etc.
+For commands like `/start` or `/help`:
 
 ```rust
 #[TeloxidePlugin(commands = ["start", "help"], prefixes = ["/", "!"])]
 async fn help_command(bot: Bot, msg: Message) {
-    bot.send_message(msg.chat.id, "Welcome! Use /ping to test me!").await.unwrap();
+    bot.send_message(msg.chat.id, "Welcome!").await.unwrap();
 }
 ```
 
-**What this does:**
-- Responds to `/start` OR `/help`
-- Also responds to `!start` OR `!help`
-- Sends a welcome message
+You can pass multiple commands and prefixes. The handler will respond to any combination.
 
-### Regex Plugins 🔍
+### Regex Plugins
 
-Respond to messages that match a pattern.
+For pattern matching:
 
 ```rust
 #[TeloxidePlugin(regex = ["(?i)good morning"])]
 async fn morning_greeting(bot: Bot, msg: Message) {
-    bot.send_message(msg.chat.id, "Good morning! ☀️").await.unwrap();
+    bot.send_message(msg.chat.id, "Morning! ☕").await.unwrap();
 }
 ```
 
-**What this does:**
-- `(?i)` means case-insensitive
-- Responds to "good morning", "Good Morning", "GOOD MORNING", etc.
+The `(?i)` flag makes it case-insensitive. You can use full regex features here, but keep in mind it'll run on every message, so don't go too crazy with complex patterns.
 
-### Callback Plugins 🔘
+### Callback Plugins
 
-Handle button clicks and inline keyboard interactions.
+For handling inline button clicks:
 
 ```rust
 #[TeloxidePlugin(commands = ["menu"], prefixes = ["/"])]
 async fn show_menu(bot: Bot, msg: Message) {
     let button = InlineKeyboardButton::new(
-        "Click me!",
-        InlineKeyboardButtonKind::CallbackData("button_clicked".to_string())
+        "Click me",
+        InlineKeyboardButtonKind::CallbackData("btn_click".to_string())
     );
     let keyboard = InlineKeyboardMarkup::new(vec![vec![button]]);
-
-    bot.send_message(msg.chat.id, "Choose an option:")
+    
+    bot.send_message(msg.chat.id, "Pick something:")
         .reply_markup(keyboard)
         .await
         .unwrap();
 }
 
-#[TeloxidePlugin(callback = ["button_clicked"])]
-async fn handle_button_click(bot: Bot, cq: CallbackQuery) {
-    if let Some(message) = cq.message {
-        bot.send_message(message.chat().id, "Button was clicked! 🎉").await.unwrap();
+#[TeloxidePlugin(callback = ["btn_click"])]
+async fn handle_click(bot: Bot, cq: CallbackQuery) {
+    if let Some(msg) = cq.message {
+        bot.send_message(msg.chat().id, "You clicked it!").await.unwrap();
         bot.answer_callback_query(cq.id).await.unwrap();
     }
 }
 ```
 
-## 🔧 Advanced Usage
-
-### Multiple Commands & Prefixes
-
-One plugin can handle multiple commands with different prefixes:
-
-```rust
-#[TeloxidePlugin(commands = ["start", "help", "h"], prefixes = ["/", "!", "."])]
-async fn universal_help(bot: Bot, msg: Message) {
-    bot.send_message(
-        msg.chat.id,
-        "🤖 Available: /start, /help, !start, !help, .start, .help"
-    ).await.unwrap();
-}
-```
+## Advanced Usage
 
 ### Error Handling
 
-Handle errors gracefully in your plugins:
+The macro doesn't magically handle errors for you. You'll still need to deal with them in your handlers:
 
 ```rust
-#[TeloxidePlugin(commands = ["error_test"], prefixes = ["/"])]
+#[TeloxidePlugin(commands = ["might_fail"], prefixes = ["/"])]
 async fn error_example(bot: Bot, msg: Message) {
-    match bot.send_message(msg.chat.id, "This might fail!").await {
+    match bot.send_message(msg.chat.id, "Trying...").await {
         Ok(_) => {},
         Err(e) => {
-            eprintln!("Failed to send message: {:?}", e);
-            let _ = bot.send_message(msg.chat.id, "❌ Sorry, something went wrong!").await;
+            eprintln!("Send failed: {}", e);
         }
     }
 }
@@ -244,231 +195,113 @@ async fn error_example(bot: Bot, msg: Message) {
 
 ### State Management
 
-For stateful bots, you can use static variables or dependency injection:
+There's no built-in state management yet. For simple counters, you can use statics:
 
 ```rust
 use std::sync::atomic::{AtomicU32, Ordering};
 
-static COUNTER: AtomicU32 = AtomicU32::new(0);
+static COUNT: AtomicU32 = AtomicU32::new(0);
 
 #[TeloxidePlugin(commands = ["count"], prefixes = ["/"])]
-async fn counter_bot(bot: Bot, msg: Message) {
-    let count = COUNTER.fetch_add(1, Ordering::SeqCst);
-    bot.send_message(msg.chat.id, format!("Count: {}", count + 1))
+async fn counter(bot: Bot, msg: Message) {
+    let current = COUNT.fetch_add(1, Ordering::SeqCst);
+    bot.send_message(msg.chat.id, format!("Count: {}", current + 1))
         .await.unwrap();
 }
 ```
 
-## 📚 Examples
+For anything more complex, you'll need to roll your own solution or wait for a future version.
 
-### Echo Bot
+### Performance
+
+Plugin registration happens at startup, not runtime. The regex patterns are compiled once and cached. For bots handling tons of messages, the dispatch overhead is minimal - it's basically a hashmap lookup and a regex match against cached patterns.
+
+If you have hundreds of plugins with complex regexes, yeah, maybe reconsider your bot design.
+
+## Examples
+
+Check the `examples/` directory in the repo for full working bots:
+
+- `echo.rs` - Simple echo functionality
+- `weather.rs` - Hitting an external API (needs an API key)
+- `menu.rs` - Interactive menus with callbacks
+
+The weather example looks like this in practice:
 
 ```rust
-#[TeloxidePlugin(commands = ["echo"], prefixes = ["/"])]
-async fn echo_bot(bot: Bot, msg: Message) {
-    if let Some(text) = msg.text() {
-        bot.send_message(msg.chat.id, text).await.unwrap();
-    }
-}
-```
-
-### Weather Bot (External API)
-
-```rust
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-struct WeatherResponse {
-    weather: Vec<WeatherInfo>,
-    main: MainInfo,
-}
-
-#[derive(Deserialize)]
-struct WeatherInfo {
-    main: String,
-    description: String,
-}
-
-#[derive(Deserialize)]
-struct MainInfo {
-    temp: f64,
-    humidity: u32,
-}
-
 #[TeloxidePlugin(commands = ["weather"], prefixes = ["/"])]
-async fn weather_bot(bot: Bot, msg: Message) {
-    if let Some(city) = msg.text().unwrap().strip_prefix("/weather ") {
-        match fetch_weather(city).await {
-            Ok(weather) => {
-                let response = format!(
-                    "🌤️ Weather in {}: {} ({}°C, {}% humidity)",
-                    city, weather.weather[0].description,
-                    weather.main.temp, weather.main.humidity
-                );
-                bot.send_message(msg.chat.id, response).await.unwrap();
-            }
-            Err(_) => {
-                bot.send_message(msg.chat.id, "❌ Failed to fetch weather").await.unwrap();
+async fn weather(bot: Bot, msg: Message) {
+    if let Some(text) = msg.text() {
+        if let Some(city) = text.strip_prefix("/weather ") {
+            match get_weather_for_city(city).await {
+                Ok(w) => {
+                    bot.send_message(msg.chat.id, format!("It's {}°C in {}", w.temp, city))
+                        .await.unwrap();
+                }
+                Err(_) => {
+                    bot.send_message(msg.chat.id, "Couldn't fetch weather")
+                        .await.unwrap();
+                }
             }
         }
     }
 }
 ```
 
-### Interactive Menu Bot
+You'll need to implement `get_weather_for_city()` yourself - this crate doesn't include HTTP clients.
 
-```rust
-#[TeloxidePlugin(commands = ["menu"], prefixes = ["/"])]
-async fn show_menu(bot: Bot, msg: Message) {
-    let keyboard = InlineKeyboardMarkup::new(vec![
-        vec![
-            InlineKeyboardButton::new("Option 1", InlineKeyboardButtonKind::CallbackData("opt1".to_string())),
-            InlineKeyboardButton::new("Option 2", InlineKeyboardButtonKind::CallbackData("opt2".to_string())),
-        ],
-        vec![
-            InlineKeyboardButton::new("Option 3", InlineKeyboardButtonKind::CallbackData("opt3".to_string())),
-        ]
-    ]);
+## API Reference
 
-    bot.send_message(msg.chat.id, "Choose an option:")
-        .reply_markup(keyboard)
-        .await.unwrap();
-}
+The `#[TeloxidePlugin]` macro accepts these attributes:
 
-#[TeloxidePlugin(callback = ["opt1", "opt2", "opt3"])]
-async fn handle_menu_selection(bot: Bot, cq: CallbackQuery) {
-    if let Some(data) = &cq.data {
-        let response = match data.as_str() {
-            "opt1" => "You selected Option 1! 🎯",
-            "opt2" => "You selected Option 2! 🎯",
-            "opt3" => "You selected Option 3! 🎯",
-            _ => "Unknown option"
-        };
+| Attribute | What it does | Example |
+|-----------|--------------|---------|
+| `commands` | List of command names | `["ping", "start"]` |
+| `prefixes` | Command prefixes | `["/", "!"]` |
+| `regex` | Regex patterns to match | `["(?i)hi"]` |
+| `callback` | Callback data strings | `["btn1"]` |
 
-        if let Some(message) = cq.message {
-            bot.send_message(message.chat().id, response).await.unwrap();
-        }
-        bot.answer_callback_query(cq.id).await.unwrap();
-    }
-}
-```
+You can combine multiple attributes on the same function, though it's usually cleaner to keep them separate.
 
-## 🛠️ API Reference
+## Troubleshooting
 
-### `#[TeloxidePlugin]` Attributes
+**Bot doesn't respond?**
 
-| Attribute | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `commands` | `Vec<&str>` | Command names to respond to | `["ping", "start"]` |
-| `prefixes` | `Vec<&str>` | Command prefixes | `["/", "!"]` |
-| `regex` | `&str` | Regex pattern for matching | `"(?i)hello"` |
-| `callback` | `&str` | Callback data filter | `"button_clicked"` |
+- Double-check your token
+- Make sure you're actually calling `dispatch()` in your message handler
+- Run with `RUST_LOG=debug` to see what's happening
 
-### Core Types
+**Compilation errors?**
 
-- **`PluginContext`**: Contains bot instance, message, and callback query
-- **`dispatch()`**: Main function that routes messages to appropriate plugins
-- **`PluginMeta`**: Metadata structure for plugin registration
+- This macro relies on `teloxide` 0.17+. Older versions won't work.
+- Make sure you've imported the macro: `use teloxide_plugins::TeloxidePlugin;`
 
-## ⚡ Performance & Architecture
+**Regex not matching?**
 
-### Runtime-Free Plugin Registration
-Plugins are registered during static initialization, before the tokio runtime starts:
+Test your pattern on [regex101.com](https://regex101.com) first. Remember that `(?i)` is your friend for case-insensitive matches.
 
-```rust
-#[ctor::ctor]
-fn plugin_constructor() {
-    register_plugin(&plugin_metadata);
-}
-```
+## Contributing
 
-### Zero-Blocking Runtime
-Once the bot is running, all operations are fully async:
+This is a side project, so PRs are welcome but might take a bit to review. Some areas that need work:
 
-- ✅ **Plugin registration**: Static initialization (microseconds)
-- ✅ **Message dispatch**: Fully async with `await` points
-- ✅ **Plugin execution**: Each plugin runs independently async
-- ✅ **Regex compilation**: Cached with concurrent read access
+- Better error messages from the macro
+- State management helpers
+- More test coverage
 
-### Production Benefits
-- **Startup**: ~1 microsecond per plugin registration
-- **Runtime**: Zero blocking operations, unlimited concurrent message processing
-- **Scalability**: Handles thousands of concurrent messages efficiently
-- **Reliability**: No runtime dependency during initialization
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### Bot Doesn't Respond
-- ✅ **Check bot token**: Verify your token is correct and active
-- ✅ **Check permissions**: Ensure bot can send messages in the chat
-- ✅ **Verify plugin syntax**: Make sure `#[TeloxidePlugin]` attributes are correct
-- ✅ **Check bot is running**: Run `cargo run` and look for startup messages
-
-#### Compilation Errors
-- ✅ **Update dependencies**: Ensure all versions in `Cargo.toml` are compatible
-- ✅ **Check Rust version**: Requires Rust 1.70+
-- ✅ **Import statements**: Verify all necessary imports are present
-
-#### Regex Not Matching
-- ✅ **Test pattern**: Use online regex testers to validate your patterns
-- ✅ **Case sensitivity**: Use `(?i)` flag for case-insensitive matching
-- ✅ **Anchors**: Add `^` and `$` for exact matches
-
-#### Performance Issues
-- ✅ **Regex compilation**: Patterns are cached automatically
-- ✅ **Plugin count**: Too many plugins can slow down dispatch
-- ✅ **Message frequency**: Consider rate limiting for high-traffic bots
-
-### Debug Mode
-
-Enable debug logging to see what's happening:
-
-```rust
-#[TeloxidePlugin(commands = ["debug"], prefixes = ["/"])]
-async fn debug_handler(bot: Bot, msg: Message) {
-    println!("Debug - Message: {:?}", msg);
-    println!("Debug - Text: {:?}", msg.text());
-    println!("Debug - Chat ID: {:?}", msg.chat.id);
-
-    bot.send_message(msg.chat.id, "Debug info logged to console").await.unwrap();
-}
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how to get involved:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Development Setup
+To get started:
 
 ```bash
 git clone https://github.com/Junaid433/teloxide-plugins.git
 cd teloxide-plugins
-
 cargo test
-
-cargo run --example bot
 ```
 
-## 📄 License
+## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+MIT - see LICENSE file for details.
 
 ---
 
-<div align="center">
+*Built because I got tired of copy-pasting dispatch trees*
 
-**Happy bot building! 🤖✨**
-
-*Made with ❤️ for the Rust community*
-
-[⭐ Star us on GitHub](https://github.com/Junaid433/teloxide-plugins) • [🐛 Report Issues](https://github.com/Junaid433/teloxide-plugins/issues) • [💬 Discussions](https://github.com/Junaid433/teloxide-plugins/discussions)
-
-</div>
+[GitHub](https://github.com/Junaid433/teloxide-plugins) - [Issues](https://github.com/Junaid433/teloxide-plugins/issues)
